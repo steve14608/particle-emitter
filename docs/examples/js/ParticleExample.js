@@ -61,7 +61,6 @@
                 const now = Date.now();
                 if (this.emitter)
                 {
-                    // console.log(now - elapsed);
                     // update emitter (convert to seconds)
                     this.emitter.update((now - elapsed) * 0.001);
                 }

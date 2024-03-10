@@ -553,16 +553,6 @@ export class Emitter
     }
 
     /**
-     * Since pixi.js v8.0.0 update method is called with Ticker instance
-     * So this method is a wrapper for old ticker version with dt parameter
-     * @param ticker - pixi.js Ticker instance
-     */
-    public updateTicker(ticker: Ticker): void
-    {
-        this.update(ticker.deltaTime);
-    }
-
-    /**
      * Updates all particles spawned by this emitter and emits new ones.
      * @param delta Time elapsed since the previous frame, in __seconds__. Or Ticker instance for pixi.js v8.0.0
      */
