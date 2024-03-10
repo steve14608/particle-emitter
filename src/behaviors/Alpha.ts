@@ -1,7 +1,7 @@
 import { Particle } from '../Particle';
 import { PropertyList } from '../PropertyList';
 import { PropertyNode, ValueList } from '../PropertyNode';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**

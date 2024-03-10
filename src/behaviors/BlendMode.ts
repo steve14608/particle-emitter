@@ -1,6 +1,7 @@
+import { BLEND_MODES } from 'pixi.js';
 import { Particle } from '../Particle';
 import { getBlendMode } from '../ParticleUtils';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**
@@ -22,13 +23,9 @@ export class BlendModeBehavior implements IEmitterBehavior
     public static editorConfig: BehaviorEditorConfig = null;
 
     public order = BehaviorOrder.Normal;
-    private value: string;
+    private value: BLEND_MODES;
     constructor(config: {
-        /**
-         * Blend mode of all particles. This value is a key from
-         * [PixiJs's BLEND_MODE enum](https://pixijs.download/release/docs/PIXI.html#BLEND_MODES).
-         */
-        blendMode: string;
+        blendMode: BLEND_MODES;
     })
     {
         this.value = config.blendMode;

@@ -1,4 +1,4 @@
-export * from './SpawnShape';
-export * from './Rectangle';
-export * from './Torus';
 export * from './PolygonalChain';
+export * from './Rectangle';
+export * from './SpawnShape';
+export * from './Torus';

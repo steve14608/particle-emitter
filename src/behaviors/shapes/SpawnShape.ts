@@ -1,4 +1,5 @@
 import { Particle } from '../../Particle';
+
 import type { ListProperty, ObjectProperty } from '../editor/Types';
 
 /**
@@ -26,7 +27,7 @@ export interface SpawnShapeClass
     /**
      * Configuration for an editor to display. This does not need to exist in production code.
      */
-    editorConfig?: ObjectProperty|ListProperty;
+    editorConfig?: ObjectProperty | ListProperty;
     /**
      * The shape constructor itself.
      * @param config The config for the shape, which should match its defined specifications.

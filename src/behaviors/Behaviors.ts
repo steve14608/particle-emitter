@@ -23,7 +23,7 @@ export interface IEmitterBehavior
      * @param particle The particle to update.
      * @param deltaSec The time to advance the particle by in seconds.
      */
-    updateParticle?(particle: Particle, deltaSec: number): void|boolean;
+    updateParticle?(particle: Particle, deltaSec: number): void | boolean;
     /**
      * A hook for when a particle is recycled.
      * @param particle The particle that was just recycled.
@@ -59,7 +59,7 @@ export interface IEmitterBehaviorClass
  * interfere with each other.
  */
 export enum BehaviorOrder
-{
+    {
     /**
      * Spawn - initial placement and/or rotation. This happens before rotation/translation due to
      * emitter rotation/position is applied.

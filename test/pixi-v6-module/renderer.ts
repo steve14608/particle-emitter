@@ -1,26 +1,14 @@
 // Override requires so that the local pixi-particles gets the @pixi packages
 // from this test project, not from the top level.
-import * as PIXIConstants from '@pixi/constants';
-import * as PIXICore from '@pixi/core';
-import * as PIXIDisplay from '@pixi/display';
-import * as PIXIMath from '@pixi/math';
-import * as PIXISettings from '@pixi/settings';
-import * as PIXISprite from '@pixi/sprite';
-import * as PIXITicker from '@pixi/ticker';
+import * as PIXI from 'pixi.js';
 
 const isOverride = (request: string) => {
 	return resolveRequest(request) ? true : false;
 };
 
-const resolveRequest = (request: string) => {
+const resolveRequest = (request: string): any => {
 	switch (request) {
-		case '@pixi/constants': return PIXIConstants;
-		case '@pixi/core': return PIXICore;
-		case '@pixi/display': return PIXIDisplay;
-		case '@pixi/math': return PIXIMath;
-		case '@pixi/settings': return PIXISettings;
-		case '@pixi/sprite': return PIXISprite;
-		case '@pixi/ticker': return PIXITicker;
+		case 'pixi.js': return PIXI;
 		default: return undefined;
 	}
 };
@@ -200,7 +188,7 @@ stage.addChild(bg);
 const emitterContainer = new Container();
 stage.addChild(emitterContainer);
 (window as any).emitter = emitter = new Emitter(
-	emitterContainer,
+	emitterContainer as any,
 	config
 );
 

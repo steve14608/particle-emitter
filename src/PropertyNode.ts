@@ -1,10 +1,11 @@
-import { generateEase, hexToRGB, EaseSegment, SimpleEase, Color } from './ParticleUtils';
 import { BasicTweenable } from './EmitterConfig';
+import { Color, EaseSegment, generateEase, hexToRGB, SimpleEase } from './ParticleUtils';
 
 /**
  * A single step of a ValueList.
  */
-export interface ValueStep<T> {
+export interface ValueStep<T>
+{
     /**
      * The color or number to use at this step.
      */
@@ -19,7 +20,8 @@ export interface ValueStep<T> {
 /**
  * Configuration for an interpolated or stepped list of numeric or color particle values.
  */
-export interface ValueList<T> {
+export interface ValueList<T>
+{
     /**
      * The ordered list of values.
      */
@@ -32,7 +34,7 @@ export interface ValueList<T> {
     /**
      * Easing that should be applied to this list, in order to alter how quickly the steps progress.
      */
-    ease?: SimpleEase|EaseSegment[];
+    ease?: SimpleEase | EaseSegment[];
 }
 /**
  * A single node in a PropertyList.
@@ -62,7 +64,7 @@ export class PropertyNode<V>
      * @param time The time for this node, between 0-1
      * @param [ease] Custom ease for this list. Only relevant for the first node.
      */
-    constructor(value: V, time: number, ease?: SimpleEase|EaseSegment[])
+    constructor(value: V, time: number, ease?: SimpleEase | EaseSegment[])
     {
         this.value = value;
         this.time = time;
@@ -89,7 +91,7 @@ export class PropertyNode<V>
      * @return The first node in the list
      */
     // eslint-disable-next-line max-len
-    public static createList<T extends(string|number)>(data: ValueList<T>|BasicTweenable<T>): PropertyNode<T extends string ? Color : T>
+    public static createList<T extends(string | number)>(data: ValueList<T> | BasicTweenable<T>): PropertyNode<T extends string ? Color : T>
     {
         if ('list' in data)
         {

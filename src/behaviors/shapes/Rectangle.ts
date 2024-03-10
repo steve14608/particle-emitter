@@ -1,6 +1,7 @@
 import { Particle } from '../../Particle';
-import type { ObjectProperty } from '../editor/Types';
 import { SpawnShape } from './SpawnShape';
+
+import type { ObjectProperty } from '../editor/Types';
 
 /**
  * A SpawnShape that randomly picks locations inside a rectangle.

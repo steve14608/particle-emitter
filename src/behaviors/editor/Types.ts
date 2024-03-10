@@ -1,3 +1,5 @@
+import { BLEND_MODES } from 'pixi.js';
+
 export interface NumberProperty
 {
     type: 'number';
@@ -34,6 +36,15 @@ export interface TextProperty
     title: string;
     description: string;
     default: string;
+}
+
+export interface BlendProperty
+{
+    type: 'blend';
+    name: string;
+    title: string;
+    description: string;
+    default: BLEND_MODES;
 }
 
 export interface PointProperty
@@ -114,11 +125,11 @@ export interface SelectSubConfigProperty
 }
 
 export type Property = NumberProperty | ColorProperty | BooleanProperty | TextProperty | PointProperty | NumberListProperty |
-    ColorListProperty | ImageProperty | ListProperty | ObjectProperty | SelectProperty | SelectSubConfigProperty;
+ColorListProperty | ImageProperty | ListProperty | ObjectProperty | SelectProperty | SelectSubConfigProperty | BlendProperty;
 
 export interface BehaviorEditorConfig
 {
-    category: 'art'|'color'|'alpha'|'scale'|'movement'|'rotation'|'blend'|'spawn'|'other';
+    category: 'art' | 'color' | 'alpha' | 'scale' | 'movement' | 'rotation' | 'blend' | 'spawn' | 'other';
     title: string;
     props: Property[];
 }

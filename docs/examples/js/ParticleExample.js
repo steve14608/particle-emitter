@@ -15,22 +15,34 @@
     {
         constructor(imagePaths, config, testContainers, stepColors)
         {
+            this.updateHook = null;
+            this.containerHook = null;
+
+            this.init(imagePaths, config, testContainers, stepColors);
+        }
+
+        async init(imagePaths, config, testContainers, stepColors)
+        {
             const canvas = document.getElementById('stage');
             // Basic PIXI Setup
             const rendererOptions = {
+                hello: true,
                 width: canvas.width,
                 height: canvas.height,
-                view: canvas,
+                canvas
             };
             /* var preMultAlpha = !!options.preMultAlpha;
             if(rendererOptions.transparent && !preMultAlpha)
                 rendererOptions.transparent = 'notMultiplied';*/
             this.stage = new PIXI.Container();
             this.emitter = null;
-            this.renderer = new PIXI.Renderer(rendererOptions);
+            this.renderer = await PIXI.autoDetectRenderer(rendererOptions);
+
+            // pixi inspector
+            globalThis.__PIXI_STAGE__ = this.stage;
+            globalThis.__PIXI_RENDERER__ = this.renderer;
+
             this.bg = null;
-            this.updateHook = null;
-            this.containerHook = null;
 
             const framerate = document.getElementById('framerate');
             const particleCount = document.getElementById('particleCount');
@@ -49,6 +61,7 @@
                 const now = Date.now();
                 if (this.emitter)
                 {
+                    // console.log(now - elapsed);
                     // update emitter (convert to seconds)
                     this.emitter.update((now - elapsed) * 0.001);
                 }
@@ -101,124 +114,134 @@
             {
                 urls = imagePaths.slice();
             }
-            const loader = PIXI.Loader.shared;
+            const assets = PIXI.Assets;
+            const allBundle = [];
             for (let i = 0; i < urls.length; ++i)
             {
-                loader.add('img' + i, urls[i]);
+                allBundle.push({ alias: 'img' + i, src: urls[i] });
             }
-            loader.load(() =>
+            assets.addBundle('allBundle', allBundle);
+            await assets.loadBundle('allBundle', null);
+
+            this.bg = new PIXI.Sprite(PIXI.Texture.WHITE);
+            // bg is a 1px by 1px image
+            this.bg.scale.x = canvas.width;
+            this.bg.scale.y = canvas.height;
+            this.bg.name = 'Background';
+            this.bg.tint = 0x000000;
+            this.stage.addChild(this.bg);
+            // Create the new emitter and attach it to the stage
+            let parentType = 0;
+            const getContainer = () =>
             {
-                this.bg = new PIXI.Sprite(PIXI.Texture.WHITE);
-                // bg is a 1px by 1px image
-                this.bg.scale.x = canvas.width;
-                this.bg.scale.y = canvas.height;
-                this.bg.tint = 0x000000;
-                this.stage.addChild(this.bg);
-                // Create the new emitter and attach it to the stage
-                let parentType = 0;
-                function getContainer()
+                switch (parentType)
                 {
-                    switch (parentType)
-                    {
-                        case 1:
-                            const pc = new PIXI.ParticleContainer();
-                            pc.setProperties({
-                                scale: true,
-                                position: true,
-                                rotation: true,
-                                uvs: true,
-                                alpha: true,
-                            });
+                    case 1:
+                        // const pc = new PIXI.ParticleContainer();
+                        // pc.setProperties({
+                        //     scale: true,
+                        //     position: true,
+                        //     rotation: true,
+                        //     uvs: true,
+                        //     alpha: true,
+                        // });
+                        //
+                        // return [pc, 'PIXI.ParticleContainer'];
+                        return [new PIXI.Container(), 'PIXI.Container'];
+                    case 2:
+                        const ctn = new PIXI.Container();
+                        ctn.isRenderGroup = false;
+                        ctn.isRenderGroupRoot = false;
 
-                            return [pc, 'PIXI.ParticleContainer'];
-                        case 2:
-                            return [new PIXI.particles.LinkedListContainer(), 'PIXI.particles.LinkedListContainer'];
-                        default:
-                            return [new PIXI.Container(), 'PIXI.Container'];
-                    }
+                        return [ctn, 'PIXI.Container (no render group)'];
+                    // return [new PIXI.particles.LinkedListContainer(), 'PIXI.particles.LinkedListContainer'];
+                    default:
+                        return [new PIXI.Container(), 'PIXI.Container'];
                 }
-                let [emitterContainer, containerName] = getContainer();
-                this.stage.addChild(emitterContainer);
-                if (containerType) containerType.innerHTML = containerName;
+            };
+            let [emitterContainer, containerName] = getContainer();
+            emitterContainer.name = 'emitterContainer';
+            this.stage.addChild(emitterContainer);
+            if (containerType) containerType.innerHTML = containerName;
 
-                window.emitter = this.emitter = new PIXI.particles.Emitter(
-                    emitterContainer,
-                    config,
+            window.emitter = this.emitter = new PIXI.particles.Emitter(
+                emitterContainer,
+                config,
+            );
+            if (stepColors)
+            {
+                // override the initialized list with our auto-stepped one
+                this.emitter.getBehavior('color').list.reset(
+                    PIXI.particles.ParticleUtils.createSteppedGradient(
+                        config.behaviors.find((b) => b.type === 'color').config.color.list,
+                        stepColors,
+                    ),
                 );
-                if (stepColors)
+            }
+
+            // Center on the stage
+            this.emitter.updateOwnerPos(window.innerWidth / 2, window.innerHeight / 2);
+            // this.emitter.autoUpdate = true;
+
+            // Click on the canvas to trigger
+            canvas.addEventListener('mouseup', (e) =>
+            {
+                if (!this.emitter) return;
+
+                // right click (or anything but left click)
+                if (e.button)
                 {
-                    // override the initialized list with our auto-stepped one
-                    this.emitter.getBehavior('color').list.reset(
-                        PIXI.particles.ParticleUtils.createSteppedGradient(
-                            config.behaviors.find((b) => b.type === 'color').config.color.list,
-                            stepColors,
-                        ),
-                    );
-                }
-
-                // Center on the stage
-                this.emitter.updateOwnerPos(window.innerWidth / 2, window.innerHeight / 2);
-
-                // Click on the canvas to trigger
-                canvas.addEventListener('mouseup', (e) =>
-                {
-                    if (!this.emitter) return;
-
-                    // right click (or anything but left click)
-                    if (e.button)
+                    if (testContainers)
                     {
-                        if (testContainers)
-                        {
-                            if (++parentType >= 3) parentType = 0;
-                            const oldParent = emitterContainer;
-                            [emitterContainer, containerName] = getContainer();
-                            if (containerType) containerType.innerHTML = containerName;
-                            this.stage.addChild(emitterContainer);
-                            this.emitter.parent = emitterContainer;
-                            this.stage.removeChild(oldParent);
-                            oldParent.destroy();
+                        if (++parentType >= 3) parentType = 0;
+                        const oldParent = emitterContainer;
+                        [emitterContainer, containerName] = getContainer();
+                        if (containerType) containerType.innerHTML = containerName;
+                        this.stage.addChild(emitterContainer);
+                        this.emitter.parent = emitterContainer;
+                        this.stage.removeChild(oldParent);
+                        oldParent.destroy();
 
-                            if (this.containerHook)
-                            {
-                                this.containerHook();
-                            }
+                        if (this.containerHook)
+                        {
+                            this.containerHook();
                         }
                     }
-                    else
-                    {
-                        this.emitter.emit = true;
-                        this.emitter.resetPositionTracking();
-                        this.emitter.updateOwnerPos(e.offsetX || e.layerX, e.offsetY || e.layerY);
-                    }
-                });
-
-                document.body.addEventListener('contextmenu', (e) =>
+                }
+                else
                 {
-                    e.preventDefault();
-
-                    return false;
-                });
-
-                // Start the update
-                update();
-
-                // for testing and debugging
-                window.destroyEmitter = () =>
-                {
-                    this.emitter.destroy();
-                    this.emitter = null;
-                    window.destroyEmitter = null;
-                    // cancelAnimationFrame(updateId);
-
-                    // reset SpriteRenderer's batching to fully release particles for GC
-                    // if (this.renderer.plugins && this.renderer.plugins.sprite && this.renderer.plugins.sprite.sprites)
-                    // {
-                    //     this.renderer.plugins.sprite.sprites.length = 0;
-                    // }
-
-                    this.renderer.render(this.stage);
-                };
+                    this.emitter.emit = true;
+                    this.emitter.resetPositionTracking();
+                    this.emitter.updateOwnerPos(e.offsetX || e.layerX, e.offsetY || e.layerY);
+                }
             });
+
+            document.body.addEventListener('contextmenu', (e) =>
+            {
+                e.preventDefault();
+
+                return false;
+            });
+
+            // Start the update
+            update();
+
+            // for testing and debugging
+            window.destroyEmitter = () =>
+            {
+                this.emitter.destroy();
+                this.emitter = null;
+                window.destroyEmitter = null;
+                // cancelAnimationFrame(updateId);
+
+                // reset SpriteRenderer's batching to fully release particles for GC
+                // if (this.renderer.plugins && this.renderer.plugins.sprite && this.renderer.plugins.sprite.sprites)
+                // {
+                //     this.renderer.plugins.sprite.sprites.length = 0;
+                // }
+
+                this.renderer.render(this.stage);
+            };
         }
     }
 

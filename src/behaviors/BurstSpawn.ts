@@ -1,6 +1,6 @@
 import { Particle } from '../Particle';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
 import { DEG_TO_RADS, rotatePoint } from '../ParticleUtils';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**

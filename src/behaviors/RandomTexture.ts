@@ -1,7 +1,7 @@
-import { Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { Particle } from '../Particle';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
 import { GetTextureFromString } from '../ParticleUtils';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**
@@ -29,7 +29,7 @@ export class RandomTextureBehavior implements IEmitterBehavior
         /**
          * Images to use for each particle, randomly chosen from the list.
          */
-        textures: (Texture|string)[];
+        textures: (Texture | string)[];
     })
     {
         this.textures = config.textures.map((tex) => (typeof tex === 'string' ? GetTextureFromString(tex) : tex));

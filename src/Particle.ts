@@ -1,6 +1,6 @@
+import { Sprite } from 'pixi.js';
 import { Emitter } from './Emitter';
 import { LinkedListChild } from './LinkedListContainer';
-import { Sprite } from '@pixi/sprite';
 
 /**
  * An individual particle image. You shouldn't have to deal with these.

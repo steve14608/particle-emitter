@@ -1,7 +1,7 @@
-import { Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { Particle } from '../Particle';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
 import { GetTextureFromString } from '../ParticleUtils';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**
@@ -13,7 +13,7 @@ export interface AnimatedParticleArt
      * Framerate for the animation (in frames per second). A value of -1 will tie the framerate to
      * the particle's lifetime so that the animation lasts exactly as long as the particle.
      */
-    framerate: -1|number;
+    framerate: -1 | number;
     /**
      * If the animation should loop. Defaults to false.
      */
@@ -26,7 +26,7 @@ export interface AnimatedParticleArt
      * [{texture: 'myFirstTex', count: 5}, 'mySecondTex']
      * ```
      */
-    textures: (string|Texture|{texture: string|Texture; count: number})[];
+    textures: (string | Texture | {texture: string | Texture; count: number})[];
 }
 
 /**
@@ -40,7 +40,7 @@ export interface ParsedAnimatedParticleArt
     loop: boolean;
 }
 
-function getTextures(textures: (string|Texture|{texture: string|Texture; count: number})[]): Texture[]
+function getTextures(textures: (string | Texture | {texture: string | Texture; count: number})[]): Texture[]
 {
     const outTextures: Texture[] = [];
 

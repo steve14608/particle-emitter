@@ -1,21 +1,21 @@
-import { Container, DisplayObject } from '@pixi/display';
-import { Renderer, MaskData } from '@pixi/core';
-import { Rectangle } from '@pixi/math';
+// import { Container, Renderer, AlphaMaskData, Rectangle } from 'pixi.js';
+import { Container } from 'pixi.js';
 
 /** Interface for a child of a LinkedListContainer (has the prev/next properties added) */
-export interface LinkedListChild extends DisplayObject
+export interface LinkedListChild extends Container
 {
-    nextChild: LinkedListChild|null;
-    prevChild: LinkedListChild|null;
+    nextChild: LinkedListChild | null;
+    prevChild: LinkedListChild | null;
 }
+/*
 
-/**
+/!**
  * A semi-experimental Container that uses a doubly linked list to manage children instead of an
  * array. This means that adding/removing children often is not the same performance hit that
  * it would to be continually pushing/splicing.
  * However, this is primarily intended to be used for heavy particle usage, and may not handle
  * edge cases well if used as a complete Container replacement.
- */
+ *!/
 export class LinkedListContainer extends Container
 {
     private _firstChild: LinkedListChild|null = null;
@@ -165,13 +165,13 @@ export class LinkedListContainer extends Container
         return child;
     }
 
-    /**
+    /!**
      * Adds a child to the container to be rendered below another child.
      *
      * @param child The child to add
      * @param relative - The current child to add the new child relative to.
      * @return The child that was added.
-     */
+     *!/
     public addChildBelow<T extends DisplayObject>(child: T, relative: DisplayObject): T
     {
         if (relative.parent !== this)
@@ -214,13 +214,13 @@ export class LinkedListContainer extends Container
         return child;
     }
 
-    /**
+    /!**
      * Adds a child to the container to be rendered above another child.
      *
      * @param child The child to add
      * @param relative - The current child to add the new child relative to.
      * @return The child that was added.
-     */
+     *!/
     public addChildAbove<T extends DisplayObject>(child: T, relative: DisplayObject): T
     {
         if (relative.parent !== this)
@@ -604,10 +604,10 @@ export class LinkedListContainer extends Container
         throw new RangeError('removeChildren: numeric values are outside the acceptable range.');
     }
 
-    /**
+    /!**
      * Updates the transform on all children of this container for rendering.
      * Copied from and overrides PixiJS v5 method (v4 method is identical)
-     */
+     *!/
     updateTransform(): void
     {
         this._boundsID++;
@@ -631,10 +631,10 @@ export class LinkedListContainer extends Container
         }
     }
 
-    /**
+    /!**
      * Recalculates the bounds of the container.
      * Copied from and overrides PixiJS v5 method (v4 method is identical)
-     */
+     *!/
     calculateBounds(): void
     {
         this._bounds.clear();
@@ -676,9 +676,9 @@ export class LinkedListContainer extends Container
         this._bounds.updateID = this._boundsID;
     }
 
-    /**
+    /!**
      * Retrieves the local bounds of the displayObject as a rectangle object. Copied from and overrides PixiJS v5 method
-     */
+     *!/
     public getLocalBounds(rect?: Rectangle, skipChildrenUpdate = false): Rectangle
     {
         // skip Container's getLocalBounds, go directly to DisplayObject
@@ -703,9 +703,9 @@ export class LinkedListContainer extends Container
         return result;
     }
 
-    /**
+    /!**
      * Renders the object using the WebGL renderer. Copied from and overrides PixiJS v5 method
-     */
+     *!/
     render(renderer: Renderer): void
     {
         // if the object is not visible or the alpha is 0 then no need to render this element
@@ -735,9 +735,9 @@ export class LinkedListContainer extends Container
         }
     }
 
-    /**
+    /!**
      * Render the object using the WebGL renderer and advanced features. Copied from and overrides PixiJS v5 method
-     */
+     *!/
     protected renderAdvanced(renderer: Renderer): void
     {
         renderer.batch.flush();
@@ -803,9 +803,9 @@ export class LinkedListContainer extends Container
         }
     }
 
-    /**
+    /!**
      * Renders the object using the Canvas renderer. Copied from and overrides PixiJS Canvas mixin in V5 and V6.
-     */
+     *!/
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     renderCanvas(renderer: any): void
     {
@@ -837,3 +837,4 @@ export class LinkedListContainer extends Container
         }
     }
 }
+*/

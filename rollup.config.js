@@ -2,7 +2,7 @@ import path from 'path';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import typescript from 'rollup-plugin-typescript';
+import typescript from 'rollup-plugin-typescript2';
 import jscc from 'rollup-plugin-jscc';
 
 async function main()
@@ -55,7 +55,7 @@ async function main()
                 sourcemap,
             },
         ],
-        external: [/@pixi\/.*/],
+        external: ['pixi.js'],
         plugins: [jscc({ values: { _IIFE: false } })].concat(plugins)
     });
 
@@ -75,17 +75,11 @@ async function main()
                 sourcemap,
                 extend: true,
                 globals: {
-                    '@pixi/core': 'PIXI',
-                    '@pixi/constants': 'PIXI',
-                    '@pixi/math': 'PIXI',
-                    '@pixi/sprite': 'PIXI',
-                    '@pixi/settings': 'PIXI',
-                    '@pixi/ticker': 'PIXI',
-                    '@pixi/display': 'PIXI'
+                    'pixi.js': 'PIXI',
                 }
             },
             treeshake: false,
-            external: [/@pixi\/.*/],
+            external: ['pixi.js'],
             plugins: [jscc({ values: { _IIFE: true } })].concat(plugins),
         });
     }
@@ -102,7 +96,7 @@ async function main()
                 sourcemap,
             },
         ],
-        external: [/@pixi\/.*/],
+        external: ['pixi.js'],
         plugins: [jscc({
             values: {
                 _IIFE: false

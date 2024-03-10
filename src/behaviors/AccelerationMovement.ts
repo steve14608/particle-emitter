@@ -1,7 +1,7 @@
-import { Point } from '@pixi/math';
+import { Point } from 'pixi.js';
 import { Particle } from '../Particle';
-import { rotatePoint, scaleBy, length } from '../ParticleUtils';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
+import { length, rotatePoint, scaleBy } from '../ParticleUtils';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**

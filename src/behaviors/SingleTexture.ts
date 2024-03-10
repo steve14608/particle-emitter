@@ -1,7 +1,7 @@
-import { Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { Particle } from '../Particle';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
 import { GetTextureFromString } from '../ParticleUtils';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**
@@ -29,7 +29,7 @@ export class SingleTextureBehavior implements IEmitterBehavior
         /**
          * Image to use for each particle.
          */
-        texture: Texture|string;
+        texture: Texture | string;
     })
     {
         this.texture = typeof config.texture === 'string' ? GetTextureFromString(config.texture) : config.texture;

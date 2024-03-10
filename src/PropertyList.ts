@@ -1,4 +1,4 @@
-import { combineRGBComponents, SimpleEase, Color } from './ParticleUtils';
+import { Color, combineRGBComponents, SimpleEase } from './ParticleUtils';
 import { PropertyNode } from './PropertyNode';
 
 function intValueSimple(this: PropertyList<number>, lerp: number): number

@@ -7,25 +7,17 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@pixi/constants": "^6.0.4",
-    "@pixi/core": "^6.0.4",
-    "@pixi/display": "^6.0.4",
-    "@pixi/loaders": "^6.0.4",
-    "@pixi/math": "^6.0.4",
-    "@pixi/runner": "^6.0.4",
-    "@pixi/settings": "^6.0.4",
-    "@pixi/sprite": "^6.0.4",
-    "@pixi/ticker": "^6.0.4",
-    "@pixi/utils": "^6.0.4",
+    "@pixi/particle-emitter": "*",
     "@types/node": "^8.0.0",
     "electron": "^22.3.24",
     "override-require": "^1.1.1",
-    "@pixi/particle-emitter": "*",
+    "pixi.js": "^6.0.4",
     "resource-loader": "3",
     "typescript": "^4.3.4"
   },
   "workspaces": {
     "nohoist": [
+      "pixi.js",
       "@pixi/*",
       "resource-loader"
     ]

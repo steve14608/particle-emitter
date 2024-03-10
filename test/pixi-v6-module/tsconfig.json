@@ -22,7 +22,8 @@
 				"node_modules/resource-loader/typings/mini-signals.d.ts"
 			]
 		},
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"skipLibCheck": true
 	},
 	"include": [
 		"renderer.ts"

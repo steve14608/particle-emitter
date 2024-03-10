@@ -1,9 +1,9 @@
-import { Point } from '@pixi/math';
+import { Point } from 'pixi.js';
 import { Particle } from '../Particle';
-import { rotatePoint, normalize, scaleBy } from '../ParticleUtils';
+import { normalize, rotatePoint, scaleBy } from '../ParticleUtils';
 import { PropertyList } from '../PropertyList';
 import { PropertyNode, ValueList } from '../PropertyNode';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**

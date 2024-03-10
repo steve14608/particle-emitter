@@ -1,9 +1,9 @@
-import { Point } from '@pixi/math';
+import { Point } from 'pixi.js';
 import { Particle } from '../Particle';
 import { rotatePoint, verbose } from '../ParticleUtils';
 import { PropertyList } from '../PropertyList';
 import { PropertyNode, ValueList } from '../PropertyNode';
-import { IEmitterBehavior, BehaviorOrder } from './Behaviors';
+import { BehaviorOrder, IEmitterBehavior } from './Behaviors';
 import { BehaviorEditorConfig } from './editor/Types';
 
 /**
@@ -146,7 +146,7 @@ export class PathBehavior implements IEmitterBehavior
         /**
          * Algebraic expression describing the movement of the particle.
          */
-        path: string|((x: number) => number);
+        path: string | ((x: number) => number);
         /**
          * Speed of the particles in world units/second. This affects the x value in the path.
          * Unlike normal speed movement, this can have negative values.

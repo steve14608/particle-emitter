@@ -4,6 +4,16 @@
 
 A particle system library for the [PixiJS](https://github.com/pixijs/pixi.js) library. Also, we created an [interactive particle editor](http://pixijs.github.io/pixi-particles-editor/) to design and preview custom particle emitters which utilitze PixiJS Particle Emitter. Note that the editor was built for an older version of the library - to use its output you'll have to use the [`upgradeConfig()`](https://pixijs.github.io/particle-emitter/docs/modules.html#upgradeConfig) function.
 
+## Breaking changes in v6 from v5
+
+* `pixi.js` updated to v8
+* all imports now from 'pixi.js', it is backward compatible but is better to use v5 for pixi.js < v8
+* update method of Emitter now have param of type: number | Ticker
+* removed LinkedListContainer (for now, development in progress)
+* particle performance example is not working as expected now, because LinkedListContainer is not available
+* dependencies updated to newer versions (e.g. typescript version now is ^5.0.4)
+* examples updated to `pixi.js` v8
+
 ## Breaking changes in v5 from v4
 * Project has been renamed from `pixi-particles` to `@pixi/particle-emitter`
 * On `Emitter`, configuration format has drastically changed. Use [`upgradeConfig()`](https://pixijs.github.io/particle-emitter/docs/modules.html#upgradeConfig) to convert old configuration objects automatically.

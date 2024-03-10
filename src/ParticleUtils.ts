@@ -1,6 +1,4 @@
-import { Texture } from '@pixi/core';
-import { IPointData } from '@pixi/math';
-import { BLEND_MODES } from '@pixi/constants';
+import { BLEND_MODES, Point, Texture } from 'pixi.js';
 import { PropertyNode, ValueStep } from './PropertyNode';
 
 /**
@@ -13,14 +11,16 @@ export let GetTextureFromString:(d:string) => Texture = Texture.from;
 /**
  * A color value, split apart for interpolation.
  */
-export interface Color {
+export interface Color
+{
     r: number;
     g: number;
     b: number;
     a?: number;
 }
 
-export interface EaseSegment {
+export interface EaseSegment
+{
     cp: number;
     s: number;
     e: number;
@@ -44,7 +44,7 @@ export const DEG_TO_RADS = Math.PI / 180;
  * @param angle The angle to rotate by in radians
  * @param p The point to rotate around 0,0.
  */
-export function rotatePoint(angle: number, p: IPointData): void
+export function rotatePoint(angle: number, p: Point): void
 {
     if (!angle) return;
 
@@ -74,7 +74,7 @@ export function combineRGBComponents(r: number, g: number, b: number/* , a*/): n
  * @param point The point to measure length
  * @return The length of this point.
  */
-export function length(point: IPointData): number
+export function length(point: Point): number
 {
     return Math.sqrt((point.x * point.x) + (point.y * point.y));
 }
@@ -83,7 +83,7 @@ export function length(point: IPointData): number
  * Reduces the point to a length of 1.
  * @param point The point to normalize
  */
-export function normalize(point: IPointData): void
+export function normalize(point: Point): void
 {
     const oneOverLen = 1 / length(point);
 
@@ -96,7 +96,7 @@ export function normalize(point: IPointData): void
  * @param point The point to scaleBy
  * @param value The value to scale by.
  */
-export function scaleBy(point: IPointData, value: number): void
+export function scaleBy(point: Point, value: number): void
 {
     point.x *= value;
     point.y *= value;
@@ -178,12 +178,9 @@ export function generateEase(segments: EaseSegment[]): SimpleEase
  * @param name The name of the blend mode to get.
  * @return The blend mode as specified in the PIXI.BLEND_MODES enumeration.
  */
-export function getBlendMode(name: string): number
+export function getBlendMode(name: BLEND_MODES): BLEND_MODES
 {
-    if (!name) return BLEND_MODES.NORMAL;
-    name = name.toUpperCase().replace(/ /g, '_');
-
-    return (BLEND_MODES as any)[name] || BLEND_MODES.NORMAL;
+    return name || 'normal';
 }
 
 /**

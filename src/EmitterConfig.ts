@@ -1,7 +1,7 @@
 /* eslint-disable no-lonely-if */
+import { Point } from 'pixi.js';
 import { EaseSegment, SimpleEase } from './ParticleUtils';
 import { ValueList } from './PropertyNode';
-import { IPointData } from '@pixi/math';
 
 /**
  * Full Emitter configuration for initializing an Emitter instance.
@@ -107,7 +107,7 @@ export interface RandNumber
  * @param art The old art values as would have been passed into the Emitter constructor or `Emitter.init()`
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function upgradeConfig(config: EmitterConfigV2|EmitterConfigV1, art: any): EmitterConfigV3
+export function upgradeConfig(config: EmitterConfigV3 | EmitterConfigV2 | EmitterConfigV1, art: any): EmitterConfigV3
 {
     // just ensure we aren't given any V3 config data
     if ('behaviors' in config)
@@ -587,7 +587,8 @@ export function upgradeConfig(config: EmitterConfigV2|EmitterConfigV1, art: any)
  * This type information is kept to make it easy to upgrade, but otherwise
  * configuration should be made as {@link EmitterConfigV3}.
  */
-export interface EmitterConfigV2 {
+export interface EmitterConfigV2
+{
     alpha?: ValueList<number>;
     speed?: ValueList<number>;
     minimumSpeedMultiplier?: number;
@@ -614,7 +615,7 @@ export interface EmitterConfigV2 {
     spawnCircle?: {x: number; y: number; r: number; minR?: number};
     particleSpacing?: number;
     angleStart?: number;
-    spawnPolygon?: IPointData[] | IPointData[][];
+    spawnPolygon?: Point[] | Point[][];
     frequency: number;
     spawnChance?: number;
     emitterLifetime?: number;
@@ -626,7 +627,8 @@ export interface EmitterConfigV2 {
     orderedArt?: boolean;
 }
 
-export interface BasicTweenable<T> {
+export interface BasicTweenable<T>
+{
     start: T;
     end: T;
 }
@@ -636,7 +638,8 @@ export interface BasicTweenable<T> {
  * This type information is kept to maintain compatibility with the older particle tool, but otherwise
  * configuration should be made as {@link EmitterConfigV3}.
  */
-export interface EmitterConfigV1 {
+export interface EmitterConfigV1
+{
     alpha?: BasicTweenable<number>;
     speed?: BasicTweenable<number> & {minimumSpeedMultiplier?: number};
     maxSpeed?: number;
@@ -661,7 +664,7 @@ export interface EmitterConfigV1 {
     spawnCircle?: {x: number; y: number; r: number; minR?: number};
     particleSpacing?: number;
     angleStart?: number;
-    spawnPolygon?: IPointData[] | IPointData[][];
+    spawnPolygon?: Point[] | Point[][];
     frequency: number;
     spawnChance?: number;
     emitterLifetime?: number;

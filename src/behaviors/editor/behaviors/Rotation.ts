@@ -1,4 +1,4 @@
-import { RotationBehavior, StaticRotationBehavior, NoRotationBehavior } from '../../Rotation';
+import { NoRotationBehavior, RotationBehavior, StaticRotationBehavior } from '../../Rotation';
 
 RotationBehavior.editorConfig = {
     category: 'rotation',
