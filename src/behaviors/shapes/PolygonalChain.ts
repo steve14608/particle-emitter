@@ -1,4 +1,4 @@
-import { Point } from 'pixi.js';
+import { PointData } from 'pixi.js';
 import { Particle } from '../../Particle';
 import { ListProperty } from '../editor/Types';
 import { SpawnShape } from './SpawnShape';
@@ -8,8 +8,8 @@ import { SpawnShape } from './SpawnShape';
  */
 export interface Segment
 {
-    p1: Point;
-    p2: Point;
+    p1: PointData;
+    p2: PointData;
     l: number;
 }
 
@@ -49,7 +49,7 @@ export class PolygonalChain implements SpawnShape
     /**
      * @param data Point data for polygon chains. Either a list of points for a single chain, or a list of chains.
      */
-    constructor(data: Point[] | Point[][])
+    constructor(data: PointData[] | PointData[][])
     {
         this.segments = [];
         this.countingLengths = [];
@@ -60,12 +60,12 @@ export class PolygonalChain implements SpawnShape
     /**
      * @param data Point data for polygon chains. Either a list of points for a single chain, or a list of chains.
      */
-    private init(data: Point[] | Point[][]): void
+    private init(data: PointData[] | PointData[][]): void
     {
         // if data is not present, set up a segment of length 0
         if (!data || !data.length)
         {
-            this.segments.push({ p1: new Point(0, 0), p2: new Point(0, 0), l: 0 });
+            this.segments.push({ p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 }, l: 0 });
         }
         else if (Array.isArray(data[0]))
         {
@@ -73,12 +73,12 @@ export class PolygonalChain implements SpawnShape
             for (let i = 0; i < data.length; ++i)
             {
                 // loop through the chain, connecting points
-                const chain = data[i] as Point[];
-                let prevPoint = chain[0] as Point;
+                const chain = data[i] as PointData[];
+                let prevPoint = chain[0] as PointData;
 
                 for (let j = 1; j < chain.length; ++j)
                 {
-                    const second = chain[j] as Point;
+                    const second = chain[j] as PointData;
 
                     this.segments.push({ p1: prevPoint, p2: second, l: 0 });
                     prevPoint = second;
@@ -87,12 +87,12 @@ export class PolygonalChain implements SpawnShape
         }
         else
         {
-            let prevPoint = data[0] as Point;
+            let prevPoint = data[0] as PointData;
             // list of points
 
             for (let i = 1; i < data.length; ++i)
             {
-                const second = data[i] as Point;
+                const second = data[i] as PointData;
 
                 this.segments.push({ p1: prevPoint, p2: second, l: 0 });
                 prevPoint = second;

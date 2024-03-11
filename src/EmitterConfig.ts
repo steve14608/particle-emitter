@@ -1,5 +1,5 @@
 /* eslint-disable no-lonely-if */
-import { Point } from 'pixi.js';
+import { PointData } from 'pixi.js';
 import { EaseSegment, SimpleEase } from './ParticleUtils';
 import { ValueList } from './PropertyNode';
 
@@ -615,7 +615,7 @@ export interface EmitterConfigV2
     spawnCircle?: {x: number; y: number; r: number; minR?: number};
     particleSpacing?: number;
     angleStart?: number;
-    spawnPolygon?: Point[] | Point[][];
+    spawnPolygon?: PointData[] | PointData[][];
     frequency: number;
     spawnChance?: number;
     emitterLifetime?: number;
@@ -664,7 +664,7 @@ export interface EmitterConfigV1
     spawnCircle?: {x: number; y: number; r: number; minR?: number};
     particleSpacing?: number;
     angleStart?: number;
-    spawnPolygon?: Point[] | Point[][];
+    spawnPolygon?: PointData[] | PointData[][];
     frequency: number;
     spawnChance?: number;
     emitterLifetime?: number;
