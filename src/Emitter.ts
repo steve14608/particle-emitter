@@ -1,4 +1,4 @@
-import { Container, Point, Ticker } from 'pixi.js';
+import { Container, getAdjustedBlendModeBlend, Point, Ticker } from 'pixi.js';
 import { BehaviorOrder, IEmitterBehavior, IEmitterBehaviorClass } from './behaviors/Behaviors';
 import { EmitterConfigV3 } from './EmitterConfig';
 import { Particle } from './Particle';
@@ -883,107 +883,293 @@ export class Emitter {
 
 
     /**
- * 鼠标尾迹的实现，从指定位置到当前emitter位置每隔interval插值一个粒子。自动清除最老的
- * @param fromX 指定起点的x坐标
- * @param fromY 指定起点的y坐标
- * @param interval 粒子之间的间隔
- */
-    public emitLine(fromX: number, fromY: number, interval: number): void {
-        let addedCount = 0;
-        let emitPosX = fromX + this.spawnPos.x;
-        let emitPosY = fromY + this.spawnPos.y;
-        const count = Math.ceil(Math.hypot((this.ownerPos.x - fromX), (this.ownerPos.y - fromY)) / interval);
-        const deltaX = (this.ownerPos.x - fromX) / count;
-        const deltaY = (this.ownerPos.y - fromY) / count;
+     * 回收多个粒子
+     * @param particle 首个被回收的粒子
+     * @param count 回收的数量
+     * @internal
+     */
+    public recycles(particles: Particle, count: number): void {
+        if (count <= 0 || count > this.particleCount) return;
+        let endOfParticles: Particle;
 
-        const poiData = new Array(count);
+        for (let particle = particles, i = 0; i < count; particle = particle.next, ++i) {
+            for (let j = 0; j < this.recycleBehaviors.length; ++j) {
+                this.recycleBehaviors[j].recycleParticle(particle, false);
+            }
+            // // 粒子的age似乎在回收之后会进行一次正负反转，所以age判断小于0或大于最大值才回收，因此需设置为最大值，以免出现后面的粒子生命异常的情况.
+            // // 但你直接设置为0不好吗?
+            // particle.age = particle.maxLife;
+            endOfParticles = particle;
+        }
+        if (particles.prev) {
+            particles.prev.next = endOfParticles.next;
+        }
+        if (endOfParticles.next) {
+            endOfParticles.next.prev = particles.prev;
+        }
+        if (particles === this._activeParticlesFirst) {
+            this._activeParticlesFirst = endOfParticles.next;
+        }
+        if (endOfParticles === this._activeParticlesLast) {
+            this._activeParticlesLast = particles.prev;
+        }
+
+        particles.prev = null;
+        endOfParticles.next = this._poolFirst;
+        this._poolFirst = particles;
+        for (let particle = particles; particle != endOfParticles.next; particle = particle.next) {
+            if (particle.parent) {
+                particle.parent.removeChild(particle);
+            }
+        }
+        this.particleCount -= count;
+    }
+
+
+    /**
+     * 
+     * 注意，允许粒子超出最大粒子数，仅限于当前被新添加的粒子
+     */
+    public updateTrail(delta: number | Ticker, interval: number): void {
+        if (typeof delta !== 'number') {
+            delta = delta.deltaTime;
+        }
+        if (this._autoUpdate) {
+            delta = ticker.elapsedMS * 0.001;
+        }
+
+        // if we don't have a parent to add particles to, then don't do anything.
+        // this also works as a isDestroyed check
+        if (!this._parent) return;
+
+        let prevX: number;
+        let prevY: number;
+
+        // if the previous position is valid, store these for later interpolation
+        if (this._prevPosIsValid) {
+            prevX = this._prevEmitterPos.x;
+            prevY = this._prevEmitterPos.y;
+        }
+        else {
+            prevX = this.ownerPos.x;
+            prevY = this.ownerPos.y;
+        }
+        // store current position of the emitter as local variables
+        const curX = this.ownerPos.x;
+        const curY = this.ownerPos.y;
 
         let waveFirst: Particle = null;
         let waveLast: Particle = null;
+        let addedCount: number = 0;
 
-        for (let i = count; i > 0; --i, emitPosX += deltaX, emitPosY += deltaY) {
-            // see if we actually spawn one
-            if (this.spawnChance < 1 && Math.random() >= this.spawnChance) {
-                continue;
-            }
-            poiData[addedCount++] = { x: emitPosX, y: emitPosY };
-            // create particle
-            let p: Particle;
+        if (this._emit) {
+            // decrease spawn timer.说实话只用updateTrail的话这个spawnTimer没什么用
+            //this._spawnTimer -= delta < 0 ? 0 : delta;
 
-            if (this._poolFirst) {
-                p = this._poolFirst;
-                this._poolFirst = this._poolFirst.next;
-                p.next = null;
-            }
-            else {
-                p = new Particle(this);
+            let emitPosX = prevX + this.spawnPos.x;
+            let emitPosY = prevY + this.spawnPos.y;
+            let emitTimeAdvance = delta;
+
+            const count = Math.floor(Math.hypot(curX - prevX, curY - prevY) / interval);
+
+            let deltaX = 0;
+            let deltaY = 0;
+            let deltaTime = 0;
+            if (count > 0) {
+                deltaX = (curX - prevX) / count;
+                deltaY = (curY - prevY) / count;
+                deltaTime = -delta / count;
             }
 
-            let lifetime: number;
 
-            if (this.minLifetime === this.maxLifetime) {
-                lifetime = this.minLifetime;
-            }
-            else {
-                lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
-            }
-            // initialize particle
-            p.init(lifetime);
-            // add the particle to the display list
-            if (this.addAtBack) {
-                this._parent.addChildAt(p, 0);
-            }
-            else {
-                this._parent.addChild(p);
-            }
-            // add particles to list of ones in this wave
-            if (waveFirst) {
-                waveLast.next = p;
-                p.prev = waveLast;
-                waveLast = p;
-            }
-            else {
-                waveLast = waveFirst = p;
-            }
-            // increase our particle count
-            ++this.particleCount;
-        }
+            //那些生成的粒子。我不知道怎么取名，随便取了
+            const luckyDogs = new Array(count + 1)
 
-        if (waveFirst) {
-            // add particle to list of active particles
-            if (this._activeParticlesLast) {
-                this._activeParticlesLast.next = waveFirst;
-                waveFirst.prev = this._activeParticlesLast;
-                this._activeParticlesLast = waveLast;
-            }
-            else {
-                this._activeParticlesFirst = waveFirst;
-                this._activeParticlesLast = waveLast;
-            }
-            // run behavior init on particles
-            for (let i = 0; i < this.initBehaviors.length; ++i) {
-                const behavior = this.initBehaviors[i];
+            for (let i = count + 1; i > 0; i--, emitPosX += deltaX, emitPosY += deltaY, emitTimeAdvance += deltaTime) {
+                //see if we actually spawn one
+                if (this.spawnChance < 1 && Math.random() >= this.spawnChance) {
+                    continue;
+                }
+                // determine the particle lifetime
+                let lifetime;
 
-                // if we hit our special key, interrupt behaviors to apply
-                // emitter position/rotation
-                if (behavior === PositionParticle) {
-                    addedCount = 0;
-                    for (let particle = waveFirst, next; particle; particle = next) {
-                        // save next particle in case we recycle this one
-                        next = particle.next;
-                        // rotate the particle's position by the emitter's rotation
-                        if (this.rotation !== 0) {
-                            rotatePoint(this.rotation, particle.position);
-                            particle.rotation += this.rotation;
-                        }
-                        // offset by the emitter's position
-                        particle.position.x += poiData[addedCount].x;
-                        particle.position.y += poiData[addedCount++].y;
-                    }
+                if (this.minLifetime === this.maxLifetime) {
+                    lifetime = this.minLifetime;
                 }
                 else {
-                    behavior.initParticles(waveFirst);
+                    lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
                 }
+                // only make the particle if it wouldn't immediately destroy itself
+                if (emitTimeAdvance >= lifetime) {
+                    continue;
+                }
+                //存入数组
+                luckyDogs[addedCount++] = {
+                    x: emitPosX,
+                    y: emitPosY,
+                    time: emitTimeAdvance,
+                }
+                // create particle
+                let p: Particle;
+
+                if (this._poolFirst) {
+                    p = this._poolFirst;
+                    this._poolFirst = this._poolFirst.next;
+                    p.next = null;
+                }
+                else {
+                    p = new Particle(this);
+                }
+
+                // initialize particle
+                p.init(lifetime);
+                // add the particle to the display list
+                if (this.addAtBack) {
+                    this._parent.addChildAt(p, 0);
+                }
+                else {
+                    this._parent.addChild(p);
+                }
+                // add particles to list of ones in this wave
+                if (waveFirst) {
+                    waveLast.next = p;
+                    p.prev = waveLast;
+                    waveLast = p;
+                }
+                else {
+                    waveLast = waveFirst = p;
+                }
+                // increase our particle count
+                ++this.particleCount;
+            }
+
+            if (waveFirst) {
+                // add particle to list of active particles
+                if (this._activeParticlesLast) {
+                    this._activeParticlesLast.next = waveFirst;
+                    waveFirst.prev = this._activeParticlesLast;
+                    this._activeParticlesLast = waveLast;
+                }
+                else {
+                    this._activeParticlesFirst = waveFirst;
+                    this._activeParticlesLast = waveLast;
+                }
+                // run behavior init on particles
+                for (let i = 0; i < this.initBehaviors.length; ++i) {
+                    const behavior = this.initBehaviors[i];
+
+                    // if we hit our special key, interrupt behaviors to apply
+                    // emitter position/rotation
+                    if (behavior === PositionParticle) {
+                        // 说实话这样不太好
+                        addedCount = 0;
+                        for (let particle = waveFirst, next; particle; particle = next) {
+                            // save next particle in case we recycle this one
+                            next = particle.next;
+                            // rotate the particle's position by the emitter's rotation
+                            if (this.rotation !== 0) {
+                                rotatePoint(this.rotation, particle.position);
+                                particle.rotation += this.rotation;
+                            }
+                            // offset by the emitter's position
+                            particle.position.x += luckyDogs[addedCount].x;
+                            particle.position.y += luckyDogs[addedCount].y;
+
+                            // also, just update the particle's age properties while we are looping through
+                            particle.age += luckyDogs[addedCount++].time;
+                            // determine our interpolation value
+                            let lerp = particle.age * particle.oneOverLife;// lifetime / maxLife;
+
+                            // global ease affects all interpolation calculations
+                            if (this.customEase) {
+                                if (this.customEase.length === 4) {
+                                    // the t, b, c, d parameters that some tween libraries use
+                                    // (time, initial value, end value, duration)
+                                    lerp = (this.customEase as any)(lerp, 0, 1, 1);
+                                }
+                                else {
+                                    // the simplified version that we like that takes
+                                    // one parameter, time from 0-1. TweenJS eases provide this usage.
+                                    lerp = this.customEase(lerp);
+                                }
+                            }
+                            // set age percent for all interpolation calculations
+                            particle.agePercent = lerp;
+                        }
+                    }
+                    else {
+                        behavior.initParticles(waveFirst);
+                    }
+                }
+            }
+        }
+
+        // update all particle lifetimes before turning them over to behaviors
+        for (let particle = waveFirst.prev, prev; particle; particle = prev) {
+
+            prev = particle.prev;
+
+            if (addedCount >= this.maxParticles) {
+                // 新添加的粒子数可能会超出最大粒子数。为了保证尾迹的连续，应减去addedCount,而不是最大粒子数
+                this.recycles(this._activeParticlesFirst, this.particleCount - addedCount);
+                break;
+            }
+            
+            particle.age += delta;
+            if (particle.age > particle.maxLife || particle.age < 0) {
+                this.recycle(particle);
+                continue;
+            }
+
+            ++addedCount;
+
+            // determine our interpolation value
+            let lerp = particle.age * particle.oneOverLife;// lifetime / maxLife;
+
+            // global ease affects all interpolation calculations
+            if (this.customEase) {
+                if (this.customEase.length === 4) {
+                    // the t, b, c, d parameters that some tween libraries use
+                    // (time, initial value, end value, duration)
+                    lerp = (this.customEase as any)(lerp, 0, 1, 1);
+                }
+                else {
+                    // the simplified version that we like that takes
+                    // one parameter, time from 0-1. TweenJS eases provide this usage.
+                    lerp = this.customEase(lerp);
+                }
+            }
+
+            // set age percent for all interpolation calculations
+            particle.agePercent = lerp;
+
+            // let each behavior run wild on the active particles
+            for (let i = 0; i < this.updateBehaviors.length; ++i) {
+                if (this.updateBehaviors[i].updateParticle(particle, delta)) {
+                    this.recycle(particle);
+                    break;
+                }
+            }
+        }
+
+        // if the position changed before this update, then keep track of that
+        if (this._posChanged) {
+            this._prevPosIsValid = true;
+            this._posChanged = false;
+            this._prevEmitterPos.x = curX;
+            this._prevEmitterPos.y = curY;
+        }
+
+        // if we are all done and should destroy ourselves, take care of that
+        if (!this._emit && !this._activeParticlesFirst) {
+            if (this._completeCallback) {
+                const cb = this._completeCallback;
+
+                this._completeCallback = null;
+                cb();
+            }
+            if (this._destroyWhenComplete) {
+                this.destroy();
             }
         }
     }
