@@ -176,6 +176,14 @@ export class Emitter {
     protected _completeCallback: () => void;
 
     /**
+     * 该emitter附着的其他的emitter
+     */
+    protected attachedEmitters: Emitter[];
+
+    protected attachedEmitterConfigs: any[];
+
+
+    /**
      * @param particleParent The container to add the particles to.
      * @param particleImages A texture or array of textures to use
      *                       for the particles. Strings will be turned
@@ -221,6 +229,8 @@ export class Emitter {
         this._autoUpdate = false;
         this._destroyWhenComplete = false;
         this._completeCallback = null;
+        this.attachedEmitters = [];
+        this.attachedEmitterConfigs = [];
 
         // set the initial parent
         this.parent = particleParent;
@@ -961,6 +971,7 @@ export class Emitter {
         let waveFirst: Particle = null;
         let waveLast: Particle = null;
         let addedCount: number = 0;
+        const count = Math.floor(Math.hypot(curX - prevX, curY - prevY) / interval);
 
         if (this._emit) {
             // decrease spawn timer.说实话只用updateTrail的话这个spawnTimer没什么用
@@ -970,7 +981,7 @@ export class Emitter {
             let emitPosY = prevY + this.spawnPos.y;
             let emitTimeAdvance = delta;
 
-            const count = Math.floor(Math.hypot(curX - prevX, curY - prevY) / interval);
+
 
             let deltaX = 0;
             let deltaY = 0;
@@ -1105,7 +1116,7 @@ export class Emitter {
         }
 
         // update all particle lifetimes before turning them over to behaviors
-        for (let particle = waveFirst.prev, prev; particle; particle = prev) {
+        for (let particle = waveFirst ? waveFirst.prev : this._activeParticlesLast, prev; particle; particle = prev) {
 
             prev = particle.prev;
 
@@ -1114,7 +1125,7 @@ export class Emitter {
                 this.recycles(this._activeParticlesFirst, this.particleCount - addedCount);
                 break;
             }
-            
+
             particle.age += delta;
             if (particle.age > particle.maxLife || particle.age < 0) {
                 this.recycle(particle);
@@ -1152,6 +1163,18 @@ export class Emitter {
             }
         }
 
+        for (let i = 0; i < this.attachedEmitters.length; ++i) {
+            const emitter = this.attachedEmitters[i];
+            if (!this.attachedEmitterConfigs[i].spawnWhenDrag || count > 0) {
+                emitter._emit = true;
+                emitter.updateOwnerPos(curX, curY)
+            }
+            else{
+                emitter._emit = false;
+            }
+            this.attachedEmitters[i].update(delta);
+        }
+
         // if the position changed before this update, then keep track of that
         if (this._posChanged) {
             this._prevPosIsValid = true;
@@ -1172,6 +1195,13 @@ export class Emitter {
                 this.destroy();
             }
         }
+    }
+
+
+    public addEmitter(emitter: Emitter, config?: any) {
+        this.attachedEmitters.push(emitter);
+        this.attachedEmitterConfigs.push(config)
+        emitter.updateOwnerPos(this.ownerPos.x, this.ownerPos.y);
     }
 
 
