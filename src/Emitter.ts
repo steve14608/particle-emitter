@@ -92,7 +92,7 @@ export class Emitter {
      */
     public particlesPerWave: number;
     /**
-     * Rotation of the emitter or emitter's owner in radians. This is added to
+     * Rotation of the emitter or emitter's owner in degrees. This is added to
      * the calculated spawn angle.
      * To change this, use rotate().
      */
@@ -257,7 +257,7 @@ export class Emitter {
         this._attachedEmitters = [];
         this._attachedEmitterConfigs = [];
         this._distance = 0;
-        this._interval = 0.2;
+        this._interval = 2;
         this._emitsTaskList = [];
         this._emitsTaskTimer = [];
 
@@ -463,7 +463,7 @@ export class Emitter {
     /**
      * Sets the rotation of the emitter to a new value. This rotates the spawn position in addition
      * to particle direction.
-     * @param newRot The new rotation, in radians.
+     * @param newRot The new rotation, in degrees.
      */
     public rotate(newRot: number): void {
         if (this.rotation === newRot) return;
@@ -1012,9 +1012,10 @@ export class Emitter {
         let addedCount: number = 0;
         this._distance += Math.hypot(curX - prevX, curY - prevY);
         const count = Math.floor(Math.max(this._distance, 0) / this._interval);
-        this._distance -= (count + 1) * this._interval;
 
-        if (this._emit) {
+        // this._distance -= (count + 1) * this._interval;
+
+        if (this._emit && count > 0) {
             // decrease spawn timer.说实话只用updateTrail的话这个spawnTimer没什么用
             //this._spawnTimer -= delta < 0 ? 0 : delta;
 
@@ -1027,17 +1028,18 @@ export class Emitter {
             let deltaX = 0;
             let deltaY = 0;
             let deltaTime = 0;
-            if (count > 0) {
-                deltaX = (curX - prevX) / count;
-                deltaY = (curY - prevY) / count;
-                deltaTime = -delta / count;
-            }
+
+            deltaX = (curX - prevX) / count;
+            deltaY = (curY - prevY) / count;
+            deltaTime = -delta / count;
+
+            this._distance -= count * this._interval;
 
 
             //那些生成的粒子。我不知道怎么取名，随便取了
             const luckyDogs = new Array(count + 1)
 
-            for (let i = count + 1; i > 0; i--, emitPosX += deltaX, emitPosY += deltaY, emitTimeAdvance += deltaTime) {
+            for (let i = count; i > 0; i--, emitPosX += deltaX, emitPosY += deltaY, emitTimeAdvance += deltaTime) {
                 //see if we actually spawn one
                 if (this.spawnChance < 1 && Math.random() >= this.spawnChance) {
                     continue;
@@ -1154,6 +1156,8 @@ export class Emitter {
                     }
                 }
             }
+        }else if(!this._emit){
+            this._distance  = 0;
         }
 
         // update all particle lifetimes before turning them over to behaviors
@@ -1207,7 +1211,7 @@ export class Emitter {
         for (let i = 0; i < this._attachedEmitters.length; ++i) {
             const emitter = this._attachedEmitters[i];
             if (!this._attachedEmitterConfigs[i].spawnWhenDrag || count > 0) {
-                emitter._emit = true;
+                emitter._emit = this._emit;
                 emitter.updateOwnerPos(curX, curY)
             }
             else {
