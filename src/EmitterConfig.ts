@@ -64,6 +64,11 @@ export interface EmitterConfigV3
      * a list of built in behaviors. Custom behaviors may be registered with {@link Emitter.registerBehavior}.
      */
     behaviors: BehaviorEntry[];
+
+    /**
+     * 
+     */
+    interval: number;
 }
 
 /**
@@ -128,6 +133,7 @@ export function upgradeConfig(config: EmitterConfigV3 | EmitterConfigV2 | Emitte
         emit: config.emit,
         autoUpdate: config.autoUpdate,
         behaviors: [],
+        interval: 0.2
     };
 
     // set up the alpha
