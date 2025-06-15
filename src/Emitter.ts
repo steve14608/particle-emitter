@@ -44,15 +44,15 @@ export class Emitter {
      * Active recycle behaviors for this emitter.
      */
     protected recycleBehaviors: IEmitterBehavior[];
-    // properties for individual particles
-    /**
-     * The minimum lifetime for a particle, in seconds.
-     */
-    public minLifetime: number;
-    /**
-     * The maximum lifetime for a particle, in seconds.
-     */
-    public maxLifetime: number;
+    // // properties for individual particles
+    // /**
+    //  * The minimum lifetime for a particle, in seconds.
+    //  */
+    // public minLifetime: number;
+    // /**
+    //  * The maximum lifetime for a particle, in seconds.
+    //  */
+    // public maxLifetime: number;
     /**
      * An easing function for nonlinear interpolation of values. Accepts a single
      * parameter of time as a value from 0-1, inclusive. Expected outputs are values
@@ -225,8 +225,8 @@ export class Emitter {
         this.updateBehaviors = [];
         this.recycleBehaviors = [];
         // properties for individual particles
-        this.minLifetime = 0;
-        this.maxLifetime = 0;
+        // this.minLifetime = 0;
+        // this.maxLifetime = 0;
         this.customEase = null;
         // properties for spawning particles
         this._frequency = 1;
@@ -320,8 +320,8 @@ export class Emitter {
         // /////////////////////////
 
         // set up the lifetime
-        this.minLifetime = config.lifetime.min;
-        this.maxLifetime = config.lifetime.max;
+        // this.minLifetime = config.lifetime.min;
+        // this.maxLifetime = config.lifetime.max;
         // use the custom ease if provided
         if (config.ease) {
             this.customEase = typeof config.ease === 'function'
@@ -383,6 +383,8 @@ export class Emitter {
 
         behaviors.push(PositionParticle);
         behaviors.sort((a, b) => {
+            if ((a as IEmitterBehavior).order === BehaviorOrder.Lifetime) return -1;
+            if ((b as IEmitterBehavior).order === BehaviorOrder.Lifetime) return 1;
             if (a === PositionParticle) {
                 return (b as IEmitterBehavior).order === BehaviorOrder.Spawn ? 1 : -1;
             }
@@ -675,18 +677,18 @@ export class Emitter {
                         continue;
                     }
                     // determine the particle lifetime
-                    let lifetime;
+                    // let lifetime;
 
-                    if (this.minLifetime === this.maxLifetime) {
-                        lifetime = this.minLifetime;
-                    }
-                    else {
-                        lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
-                    }
-                    // only make the particle if it wouldn't immediately destroy itself
-                    if (-this._spawnTimer >= lifetime) {
-                        continue;
-                    }
+                    // if (this.minLifetime === this.maxLifetime) {
+                    //     lifetime = this.minLifetime;
+                    // }
+                    // else {
+                    //     lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
+                    // }
+                    // // only make the particle if it wouldn't immediately destroy itself
+                    // if (-this._spawnTimer >= lifetime) {
+                    //     continue;
+                    // }
                     // create particle
                     let p: Particle;
 
@@ -700,7 +702,7 @@ export class Emitter {
                     }
 
                     // initialize particle
-                    p.init(lifetime);
+                    //p.init(lifetime);
                     // add the particle to the display list
                     if (this.addAtBack) {
                         this._parent.addChildAt(p, 0);
@@ -851,16 +853,16 @@ export class Emitter {
                 p = new Particle(this);
             }
 
-            let lifetime: number;
+            // let lifetime: number;
 
-            if (this.minLifetime === this.maxLifetime) {
-                lifetime = this.minLifetime;
-            }
-            else {
-                lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
-            }
+            // if (this.minLifetime === this.maxLifetime) {
+            //     lifetime = this.minLifetime;
+            // }
+            // else {
+            //     lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
+            // }
             // initialize particle
-            p.init(lifetime);
+            //p.init(lifetime);
             // add the particle to the display list
             if (this.addAtBack) {
                 this._parent.addChildAt(p, 0);
@@ -1045,18 +1047,18 @@ export class Emitter {
                     continue;
                 }
                 // determine the particle lifetime
-                let lifetime;
+                // let lifetime;
 
-                if (this.minLifetime === this.maxLifetime) {
-                    lifetime = this.minLifetime;
-                }
-                else {
-                    lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
-                }
-                // only make the particle if it wouldn't immediately destroy itself
-                if (emitTimeAdvance >= lifetime) {
-                    continue;
-                }
+                // if (this.minLifetime === this.maxLifetime) {
+                //     lifetime = this.minLifetime;
+                // }
+                // else {
+                //     lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
+                // }
+                // // only make the particle if it wouldn't immediately destroy itself
+                // if (emitTimeAdvance >= lifetime) {
+                //     continue;
+                // }
                 //存入数组
                 luckyDogs[addedCount++] = {
                     x: emitPosX,
@@ -1076,7 +1078,7 @@ export class Emitter {
                 }
 
                 // initialize particle
-                p.init(lifetime);
+                //p.init(lifetime);
                 // add the particle to the display list
                 if (this.addAtBack) {
                     this._parent.addChildAt(p, 0);
@@ -1282,18 +1284,18 @@ export class Emitter {
                 continue;
             }
             // determine the particle lifetime
-            let lifetime;
+            // let lifetime;
 
-            if (this.minLifetime === this.maxLifetime) {
-                lifetime = this.minLifetime;
-            }
-            else {
-                lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
-            }
-            // only make the particle if it wouldn't immediately destroy itself
-            if (-this._spawnTimer >= lifetime) {
-                continue;
-            }
+            // if (this.minLifetime === this.maxLifetime) {
+            //     lifetime = this.minLifetime;
+            // }
+            // else {
+            //     lifetime = (Math.random() * (this.maxLifetime - this.minLifetime)) + this.minLifetime;
+            // }
+            // // only make the particle if it wouldn't immediately destroy itself
+            // if (-this._spawnTimer >= lifetime) {
+            //     continue;
+            // }
             // create particle
             let p: Particle;
 
@@ -1307,7 +1309,7 @@ export class Emitter {
             }
 
             // initialize particle
-            p.init(lifetime);
+            //p.init(lifetime);
 
             // add particles to list of ones in this wave
             if (waveFirst) {

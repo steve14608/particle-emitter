@@ -22,3 +22,4 @@ export * from './Scale';
 export * from './ShapeSpawn';
 export * from './SingleTexture';
 export * from './SpeedMovement';
+export * from './Lifetime';

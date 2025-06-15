@@ -60,17 +60,18 @@ export interface IEmitterBehaviorClass
  */
 export enum BehaviorOrder
     {
+    Lifetime = 0,
     /**
      * Spawn - initial placement and/or rotation. This happens before rotation/translation due to
      * emitter rotation/position is applied.
      */
-    Spawn = 0,
+    Spawn = 1,
     /**
      * Normal priority, for things that don't matter when they are applied.
      */
-    Normal = 2,
+    Normal = 3,
     /**
      * Delayed priority, for things that need to read other values in order to act correctly.
      */
-    Late = 5,
+    Late = 6,
 }

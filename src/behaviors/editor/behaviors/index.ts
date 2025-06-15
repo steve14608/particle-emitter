@@ -12,3 +12,4 @@ import './Scale';
 import './ShapeSpawn';
 import './SingleTexture';
 import './SpeedMovement';
+import './Lifetime';
