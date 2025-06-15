@@ -1375,7 +1375,9 @@ export class Emitter {
 
 
     }
-
+    /**
+     * 用于emitTask和update的粒子链表的锁
+     */
     protected async _lock(): Promise<() => void> {
         const unlock = () => {
             if (this._waiting) {
@@ -1396,7 +1398,10 @@ export class Emitter {
             return unlock;
         }
     }
-
+    /**
+     * 按频率生成指定数量的粒子。不建议与emit = true一起使用
+     * @param delta 时间间隔
+     */
     protected async _emitTask(delta: number) {
         // const time0 = Date.now();
         const unlock = await this._lock();
@@ -1450,6 +1455,16 @@ export class Emitter {
             }
         }
         unlock();
+    }
+    /**
+     * 将位置移动到指定地方，但不触发update的那个插值
+     * @param x x坐标
+     * @param y y坐标
+     */
+    protected teleport(x: number, y:number){
+        this.ownerPos.x = x;
+        this.ownerPos.y = y;
+        this._prevPosIsValid = false;
     }
 
 

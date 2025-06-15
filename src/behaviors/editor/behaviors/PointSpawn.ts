@@ -1,6 +1,6 @@
-import { PointSpawn } from '../../PointSpawn';
+import { PointSpawnBehavior } from '../../PointSpawn';
 
-PointSpawn.editorConfig = {
+PointSpawnBehavior.editorConfig = {
     category: 'spawn',
     title: 'Point',
     props: [],
